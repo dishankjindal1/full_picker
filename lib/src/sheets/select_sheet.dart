@@ -111,11 +111,9 @@ class _SheetSelectState extends State<SelectSheet> {
       case 1:
         crossAxisCount = 1;
         childAspectRatio = 6;
-        break;
       case 2:
         crossAxisCount = 2;
         childAspectRatio = 3;
-        break;
 
       default:
         crossAxisCount = 3;

@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:full_picker/full_picker.dart';
-import 'package:full_picker/src/dialogs/url_input_dialog.dart';
 import 'package:full_picker/src/sheets/voice_recorder_sheet.dart';
 import 'package:full_picker/src/utils/pl.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -76,8 +75,8 @@ Future<FullPickerOutput?> getFiles({
   final bool imageCropper = false,
   final bool multiFile = false,
 }) async {
-  final ProgressIndicatorDialog progressDialog =
-      ProgressIndicatorDialog(context);
+  // final ProgressIndicatorDialog progressDialog =
+  //     ProgressIndicatorDialog(context);
 
   final FilePickerResult? result = await FilePicker.platform
       .pickFiles(
@@ -86,14 +85,20 @@ Future<FullPickerOutput?> getFiles({
     allowedExtensions: allowedExtensions,
     onFileLoading: (final FilePickerStatus value) {
       if (value == FilePickerStatus.picking) {
-        progressDialog.show();
+        // progressDialog.show();
+        return null;
       } else {
         return null;
       }
     },
   )
       .catchError((final _, final __) {
-    showFullPickerToast(globalFullPickerLanguage.denyAccessPermission, context);
+    if (context.mounted) {
+      showFullPickerToast(
+        globalFullPickerLanguage.denyAccessPermission,
+        context,
+      );
+    }
     return null;
   });
 
@@ -205,7 +210,7 @@ Future<FullPickerOutput?> getFiles({
       }
 
       if (!Pl.isWindows) {
-        progressDialog.dismiss();
+        // progressDialog.dismiss();
       }
 
       if (pickerFileType == FullPickerType.mixed) {
@@ -248,7 +253,7 @@ Future<FullPickerOutput?> getFiles({
       return null;
     }
   } catch (e) {
-    progressDialog.dismiss();
+    // progressDialog.dismiss();
   }
   return null;
 }
@@ -457,8 +462,8 @@ Future<void> getFullPicker({
     final String? url = await showDialog<String?>(
       context: context,
       barrierDismissible: false,
-      builder: (final BuildContext context) =>
-          URLInputDialog(body: bodyTextUrl),
+      builder: (final BuildContext context) => const SizedBox.shrink(),
+      //  URLInputDialog(body: bodyTextUrl),
     );
 
     if (url != null) {
@@ -509,25 +514,25 @@ Future<File?> videoCompress({
   final ValueNotifier<double> onProgress = ValueNotifier<double>(0);
   final LightCompressor lightCompressor = LightCompressor();
 
-  final LightCompressor compressor = LightCompressor();
+  // final LightCompressor compressor = LightCompressor();
 
-  final PercentProgressDialog progressDialog = PercentProgressDialog(
-    context,
-    (final void value) {
-      if (onProgress.value.toString() != '1.0') {
-        compressor.cancelCompression();
-      }
-    },
-    onProgress,
-    globalFullPickerLanguage.onCompressing,
-  );
+  // final PercentProgressDialog progressDialog = PercentProgressDialog(
+  //   context,
+  //   (final void value) {
+  //     if (onProgress.value.toString() != '1.0') {
+  //       compressor.cancelCompression();
+  //     }
+  //   },
+  //   onProgress,
+  //   globalFullPickerLanguage.onCompressing,
+  // );
 
   LightCompressor().onProgressUpdated.listen((final double event) {
     onProgress.value = event / 100;
   });
 
   try {
-    await progressDialog.show();
+    // await progressDialog.show();
     final dynamic response = await lightCompressor.compressVideo(
       path: mainFile.path,
       videoQuality: VideoQuality.medium,
@@ -539,7 +544,7 @@ Future<File?> videoCompress({
       ),
     );
 
-    progressDialog.dismiss();
+    // progressDialog.dismiss();
 
     if (response is OnSuccess) {
       return File(response.destinationPath);
@@ -565,24 +570,6 @@ Future<Uint8List?> cropImage({
   final CroppedFile? croppedFile = await ImageCropper().cropImage(
     sourcePath: sourcePath,
     compressQuality: 20,
-    aspectRatioPresets: Platform.isAndroid
-        ? <CropAspectRatioPreset>[
-            CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9,
-          ]
-        : <CropAspectRatioPreset>[
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio5x3,
-            CropAspectRatioPreset.ratio5x4,
-            CropAspectRatioPreset.ratio7x5,
-            CropAspectRatioPreset.ratio16x9,
-          ],
     uiSettings: <PlatformUiSettings>[
       AndroidUiSettings(
         toolbarTitle: globalFullPickerLanguage.cropper,
